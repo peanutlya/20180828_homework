@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.StudentDao">
+  <select id="showAllStudent" resultType="entity.Student">
+      select * from t_student
+  </select>
+
+  <insert id="addStudent">
+      insert into t_student values (null,#{username},#{password},#{age},#{address})
+  </insert>
+
+  <delete id="deleteStuById">
+    delete from t_student where id=#{id}
+  </delete>
+
+  <select id="queryStudentByName" resultType="entity.Student">
+    select * from t_student where username like concat('%',#{name},'%')
+  </select>
+
+    <select id="queryStudentById" resultType="entity.Student">
+        select * from t_student where id=#{id}
+    </select>
+
+  <update id="updateStudent">
+    update t_student set username=#{username},password=#{password},age=#{age},address=#{address} where id=#{id}
+  </update>
+
+    <select id="testHot" resultType="entity.Student">
+        select * from t_user where username="hhh"
+    </select>
+    
+</mapper>

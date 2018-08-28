@@ -1,0 +1,145 @@
+package control;
+
+import dao.StudentDao;
+import entity.Student;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.ibatis.session.SqlSession;
+import service.StudentService;
+import utils.MyBatisUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet(name = "StudentServlet",urlPatterns = "/StudentServlet")
+public class StudentServlet extends HttpServlet {
+    private StudentService stuService=new StudentService();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String op = request.getParameter("op");
+        if (("showAllStudent".equals(op))) {
+            doShowAllUser(request,response);
+        }else if (("addStudent".equals(op))) {
+            try {
+                doAddStudent(request,response);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }else if(("delete".equals(op))){
+            doDeleteStudent(request,response);
+        }else if (("edit".equals(op))) {
+            doEdit(request, response);
+        }else if (("queryStudent".equals(op))) {
+            try {
+                doQueryStudent(request,response);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }else if (("update".equals(op))) {
+            doUpdate(request,response);
+        }else if(("test").equals(op)){
+            doTest(request,response);
+        }
+    }
+
+    private void doTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        SqlSession sqlSession = MyBatisUtil.getSqlSession();
+        StudentDao mapper = sqlSession.getMapper(StudentDao.class);
+        List<Student> students = mapper.testHot();
+        response.getWriter().write(students.toString());
+    }
+
+    private void doUpdate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String id = request.getParameter("id");
+        Map<String, String[]> properties = request.getParameterMap();
+        Student student=new Student();
+
+        try {
+            BeanUtils.populate(student,properties);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        student.setId(Integer.parseInt(id));
+        try {
+            stuService.updateStu(student);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        response.sendRedirect(request.getContextPath()+"/StudentServlet?op=showAllStudent");
+    }
+
+    private void doQueryStudent(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        request.setCharacterEncoding("utf-8");
+        String name=request.getParameter("name");
+        List<Student> allStuList = stuService.queryStudentByName(name);
+        request.setAttribute("allStuList",allStuList);
+        request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
+    }
+
+    private void doEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Long id = Long.parseLong(request.getParameter("id"));
+        try {
+            Student student = stuService.queryStudentById(id);
+            request.setAttribute("stu",student);
+            request.getRequestDispatcher("/admin/student/editStudent.jsp").forward(request, response);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void doDeleteStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long id = Long.parseLong(request.getParameter("id"));
+        try {
+            int i = stuService.deleteStuById(id);
+            List<Student> allStuList= stuService.showAllUser();
+            request.setAttribute("allStuList",allStuList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        response.sendRedirect(request.getContextPath()+"/StudentServlet?op=showAllStudent");
+        //request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
+
+    }
+
+    private void doAddStudent(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        Map<String, String[]> properties = request.getParameterMap();
+        Student student=new Student();
+        try {
+            BeanUtils.populate(student,properties);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        student.setId(null);
+        stuService.addStudent(student);
+        List<Student> allStuList = stuService.showAllUser();
+        request.setAttribute("allStuList",allStuList);
+        request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
+    }
+
+    private void doShowAllUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Student> allStuList=null;
+        try {
+            allStuList = stuService.showAllUser();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        request.setAttribute("allStuList",allStuList);
+        request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request,response);
+    }
+}
