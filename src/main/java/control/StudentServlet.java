@@ -22,6 +22,7 @@ import java.util.Map;
 public class StudentServlet extends HttpServlet {
     private StudentService stuService=new StudentService();
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("utf-8");
         String op = request.getParameter("op");
         if (("showAllStudent".equals(op))) {
             doShowAllUser(request,response);
@@ -77,10 +78,10 @@ public class StudentServlet extends HttpServlet {
     }
 
     private void doQueryStudent(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        request.setCharacterEncoding("utf-8");
         String name=request.getParameter("name");
         List<Student> allStuList = stuService.queryStudentByName(name);
         request.setAttribute("allStuList",allStuList);
+        request.setAttribute("name",name);
         request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
     }
 

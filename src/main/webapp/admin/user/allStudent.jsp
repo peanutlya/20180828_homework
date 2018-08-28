@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="utf-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
@@ -11,6 +11,8 @@
 </head>
 <script>
     $(function () {
+        var t=$("input[name='name']").val();
+        $("input[name='name']").val("").focus().val(t);
         $('li:eq(3)').addClass("active");
     })
 </script>
@@ -39,7 +41,7 @@
                         <div class="col-md-6"></div>
                         <div class="col-md-4">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="姓名" name="name" autofocus="">
+                                <input type="text" class="form-control" placeholder="姓名" name="name" autofocus="" value="${name}">
                                 <span class="input-group-btn">
              				        <button class="btn btn-default" type="submit">搜索</button>
              				      </span>

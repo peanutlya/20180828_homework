@@ -4,8 +4,6 @@ import javax.servlet.annotation.WebListener;
 
 @WebListener()
 public class Student{
-    private OnlineUsers onlineUsers=OnlineUsers.getInstance();
-
     private Integer id;
     private String username;
     private String password;
