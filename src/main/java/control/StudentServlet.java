@@ -1,6 +1,6 @@
 package control;
 
-import dao.StudentDao;
+import dao.StudentDaoA;
 import entity.Student;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -51,7 +51,7 @@ public class StudentServlet extends HttpServlet {
 
     private void doTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        StudentDao mapper = sqlSession.getMapper(StudentDao.class);
+        StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
         List<Student> students = mapper.testHot();
         response.getWriter().write(students.toString());
     }
@@ -68,7 +68,7 @@ public class StudentServlet extends HttpServlet {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        student.setId(Integer.parseInt(id));
+        student.setId(Long.parseLong(id));
         try {
             stuService.updateStu(student);
         } catch (SQLException e) {
@@ -102,8 +102,6 @@ public class StudentServlet extends HttpServlet {
         long id = Long.parseLong(request.getParameter("id"));
         try {
             int i = stuService.deleteStuById(id);
-            List<Student> allStuList= stuService.showAllUser();
-            request.setAttribute("allStuList",allStuList);
         } catch (SQLException e) {
             e.printStackTrace();
         }
