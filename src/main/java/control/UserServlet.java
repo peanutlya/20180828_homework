@@ -2,6 +2,7 @@ package control;
 
 import entity.OnlineUsers;
 import entity.PageBean;
+import entity.Student;
 import entity.User;
 import org.apache.commons.beanutils.BeanUtils;
 import service.UserService;
@@ -70,7 +71,7 @@ public class UserServlet extends HttpServlet {
         if(currentPageStr==null){
             currentPageStr="1";
         }
-        PageBean<User> pageBean=null;
+        PageBean<Student> pageBean=null;
         int currentPage=Integer.parseInt(currentPageStr);
         int currentCount=5;
         try{

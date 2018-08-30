@@ -1,7 +1,7 @@
 package service;
 
 import dao.StudentDao;
-import dao.StudentDaoA;
+import entity.PageBean;
 import entity.Student;
 import entity.StudentExample;
 import org.apache.ibatis.session.SqlSession;
@@ -31,11 +31,11 @@ public class StudentService {
         sqlSession.commit();*/
     }
     public int deleteStuById(Long id) throws SQLException {
-        int i=0;
         try(SqlSession sqlSession= MyBatisUtil.getSqlSession()){
             StudentDao mapper = sqlSession.getMapper(StudentDao.class);
-            i = mapper.deleteByPrimaryKey(id);
+            int i = mapper.deleteByPrimaryKey(id);
             sqlSession.commit();
+            return i;
         }
        /* try(SqlSession sqlSession= MyBatisUtil.getSqlSession()){
             StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
@@ -43,7 +43,6 @@ public class StudentService {
              i = stuDao.deleteStuById(id);
              sqlSession.commit();
         }*/
-        return i;
     }
     public Student queryStudentById(Long id) throws SQLException{
         try(SqlSession sqlSession= MyBatisUtil.getSqlSession()){
@@ -77,5 +76,40 @@ public class StudentService {
         }
        /* StudentDaoA stuDao=MyBatisUtil.getSqlSession().getMapper(StudentDaoA.class);
         return stuDao.queryStudentByName(name);*/
+    }
+
+    public PageBean findStudentForPageBean(int currentPage, int pageSize, String keywords) throws SQLException{
+        PageBean pageBean=new PageBean();
+        pageBean.setCurrentPage(currentPage);
+        pageBean.setPageSize(pageSize);
+        //int totalCount=manageDao.getTotalEmployeeInfoForPageBean(condition);
+        if(keywords==null){
+            keywords="";
+        }
+        try (SqlSession sqlSession = MyBatisUtil.getSqlSession()) {
+            StudentDao mapper = (StudentDao) MyBatisUtil.getMapper(StudentDao.class);
+            StudentExample studentExample = new StudentExample();
+            StudentExample.Criteria criteria = studentExample.createCriteria().andUsernameLike("%" + keywords + "%");
+            StudentExample.Criteria criteria1 = studentExample.createCriteria().andPasswordLike("%" + keywords + "%");
+            studentExample.or(criteria1);
+            int totalCount = (int) mapper.countByExample(studentExample);
+
+            pageBean.setTotalCount(totalCount);
+            int totalPage = (int) Math.ceil(1.0 * totalCount / pageSize);
+            pageBean.setTotalPage(totalPage);
+            //List<EmployeeInfo> employeeInfoList = manageDao.findEmployeeInfoForPageBean(currentPage, pageSize, condition);
+
+            int index = (currentPage - 1) * pageSize;
+            studentExample.setIndex(index);
+            studentExample.setPageSize(pageSize);
+            List<Student> studentList = mapper.selectByExample(studentExample);
+           /* StudentExample studentExample2=new StudentExample();
+            studentExample2.setIndex(index);
+            studentExample2.setPageSize(pageSize);*/
+            pageBean.setPageList(studentList);
+            sqlSession.close();
+            return pageBean;
+        }
+
     }
 }

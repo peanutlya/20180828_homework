@@ -1,47 +1,55 @@
 import dao.StudentDao;
-import dao.StudentDaoA;
 import entity.Student;
+import entity.StudentExample;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import utils.MyBatisUtil;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class TestClient {
+
     @Test
-    public void testDelte(){
-        SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
-        int i = mapper.deleteStuById(18L);
-        //sqlSession.commit();
-        System.out.println(i);
+    public void test1() throws SQLException {
+        QueryRunner qr = new QueryRunner();
+        String sql = "";
+        qr.query(sql, new BeanHandler<Student>(Student.class));
     }
-    
+
     @Test
-    public void testUpdate(){
-        SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
-        Student student = mapper.queryStudentById(17L);
-        student.setUsername("newname");
-        int i = mapper.updateStudent(student);
-        sqlSession.commit();
-        System.out.println(i);
+    public void test2() {
+        StudentDao mapper = MyBatisUtil.getMapper(StudentDao.class);
+        System.out.println(mapper.selectByPrimaryKey(10L).toString());
     }
+
     @Test
-    public void testHot(){
-        SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
-        List<Student> students = mapper.testHot();
-        System.out.println(students);
-    }
-    @Test
-    public void testShowAllUser(){
-        try(SqlSession sqlSession= MyBatisUtil.getSqlSession()){
-            StudentDao mapper = sqlSession.getMapper(StudentDao.class);
-            List<Student> studentList = mapper.selectByExample(null);
-            for (Student student : studentList) {
-                System.out.println(student.toString());
-            }
+    public void test3(){
+        StudentDao mapper = MyBatisUtil.getMapper(StudentDao.class);
+        StudentExample studentExample=new StudentExample();
+        studentExample.setIndex(0);
+        studentExample.setPageSize(5);
+        List<Student> studentList = mapper.selectByExample(studentExample);
+        for (Student student : studentList) {
+            System.out.println(student.toString());
         }
     }
+
+    @Test
+    public void test4(){
+        StudentDao mapper = MyBatisUtil.getMapper(StudentDao.class);
+        StudentExample studentExample=new StudentExample();
+        long i = mapper.countByExample(null);
+        System.out.println(i);
+    }
+    @Test
+    public void test5(){
+        try (SqlSession sqlSession = MyBatisUtil.getSqlSession()) {
+            StudentDao mapper = (StudentDao) MyBatisUtil.getMapper(StudentDao.class);
+
+        }
+    }
+
 }

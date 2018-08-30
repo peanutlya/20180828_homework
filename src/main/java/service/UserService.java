@@ -48,17 +48,17 @@ public class UserService {
         Long isExit=userDao.checkUsername(username);
         return  isExit>0?true:false;
     }
-    public PageBean findPageBean(int currentPage,int currentCount) throws SQLException{
+    public PageBean findPageBean(int currentPage,int pageSize) throws SQLException{
         UserDao userDao=MyBatisUtil.getSqlSession().getMapper(UserDao.class);
         PageBean pageBean=new PageBean();
         pageBean.setCurrentPage(currentPage);
-        pageBean.setCurrentCount(currentCount);
+        pageBean.setPageSize(pageSize);
         int totalCount=userDao.getTotalCount();
-        int totalPage=(int)Math.ceil(1.0*totalCount/currentCount);
+        int totalPage=(int)Math.ceil(1.0*totalCount/pageSize);
         pageBean.setTotalPage(totalPage);
         pageBean.setTotalCount(totalCount);
-        int index=(currentPage-1)*currentCount;
-        List<User> userList=userDao.findUserListForPageBean(index,currentCount);
+        int index=(currentPage-1)*pageSize;
+        List<User> userList=userDao.findUserListForPageBean(index,pageSize);
         pageBean.setPageList(userList);
         return  pageBean;
     }
@@ -67,7 +67,7 @@ public class UserService {
         UserDao userDao=MyBatisUtil.getSqlSession().getMapper(UserDao.class);
         PageBean pageBean=new PageBean();
         pageBean.setCurrentPage(currentPage);
-        pageBean.setCurrentCount(currentCount);
+        pageBean.setPageSize(currentCount);
         int totalCount=userDao.queryUserByName(name).size();
         int totalPage=(int)Math.ceil(1.0*totalCount/currentCount);
         pageBean.setTotalPage(totalPage);

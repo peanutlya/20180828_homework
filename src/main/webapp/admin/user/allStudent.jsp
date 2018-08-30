@@ -11,10 +11,15 @@
 </head>
 <script>
     $(function () {
-        var t=$("input[name='name']").val();
-        $("input[name='name']").val("").focus().val(t);
+        var t=$("input[name='keywords']").val();
+        $("input[name='keywords']").val("").focus().val(t);
         $('li:eq(3)').addClass("active");
     })
+    function findPage(currentPage) {
+        if(currentPage!=0){
+            window.location.href="${pageContext.request.contextPath}/StudentServlet?op=showAllStudent&currentPage="+currentPage+"&keywords=${keywords}";
+        }
+    }
 </script>
 <body>
 <jsp:include page="top.jsp"></jsp:include>
@@ -33,7 +38,7 @@
                 </ol>
             </div>
             <div id="content">
-                <form action="${pageContext.request.contextPath}/StudentServlet?op=queryStudent" method="post">
+                <form action="${pageContext.request.contextPath}/StudentServlet?op=showAllStudent" method="post">
                     <div class="row">
                         <div class="col-md-2">
                             <a class="btn btn-success" href="${pageContext.request.contextPath}/admin/student/addStudent.jsp">添加</a>
@@ -41,7 +46,7 @@
                         <div class="col-md-6"></div>
                         <div class="col-md-4">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="姓名" name="name" autofocus="" value="${name}">
+                                <input type="text" class="form-control" placeholder="姓名" name="keywords" autofocus="" value="${keywords}">
                                 <span class="input-group-btn">
              				        <button class="btn btn-default" type="submit">搜索</button>
              				      </span>
@@ -59,7 +64,7 @@
                         <th>操作</th>
                     </tr>
 
-                    <c:forEach items="${allStuList}" var="stu">
+                    <c:forEach items="${pageBean.pageList}" var="stu">
                         <tr>
                             <td>${stu.username}</td>
                             <td>${stu.password}</td>
@@ -71,8 +76,41 @@
                             </td>
                         </tr>
                     </c:forEach>
-
                 </table>
+                <h5>当前是第${pageBean.totalPage==0?0:pageBean.currentPage}页,共${pageBean.totalPage}页，总记录数为${pageBean.totalCount}条。</h5>
+                <nav style="text-align: center">
+                    <ul class="pagination">
+                        <li><a href="javascript:findPage(1)"><span>首页</span></a></li>
+                        <c:if test="${pageBean.currentPage==1}">
+                            <li class="disabled"><a href="javascript:void(0)"><span>上一页</span></a></li>
+                        </c:if>
+
+                        <c:if test="${pageBean.currentPage!=1}">
+                            <li><a href="javascript:findPage(${pageBean.currentPage-1})"><span>上一页</span></a></li>
+                        </c:if>
+
+                        <c:forEach begin="1" end="${pageBean.totalPage}" var="page">
+                            <c:if test="${pageBean.currentPage==page}">
+                                <li class="active"><a href="javascript:void(0)">${page}</a></li>
+                            </c:if>
+                            <c:if test="${pageBean.currentPage!=page}">
+                                <li style="margin-right:5px"><a href="javascript:findPage(${page})">${page}</a></li>
+                            </c:if>
+                        </c:forEach>
+
+                        <c:if test="${pageBean.currentPage==pageBean.totalPage||pageBean.totalPage==0}">
+                            <li class="disabled"><a href="javascript:void(0)"> <span>下一页</span>
+                            </a></li>
+
+                        </c:if>
+
+                        <c:if test="${pageBean.currentPage!=pageBean.totalPage&&pageBean.totalPage!=0}">
+                            <li><a href="javascript:findPage(${pageBean.currentPage+1})"> <span>下一页</span>
+                            </a></li>
+                        </c:if>
+                        <li><a href="javascript:findPage(${pageBean.totalPage})"><span>尾页</span></a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

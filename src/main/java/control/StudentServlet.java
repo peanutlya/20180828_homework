@@ -1,6 +1,7 @@
 package control;
 
-import dao.StudentDaoA;
+import dao.StudentDao;
+import entity.PageBean;
 import entity.Student;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -51,7 +52,7 @@ public class StudentServlet extends HttpServlet {
 
     private void doTest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         SqlSession sqlSession = MyBatisUtil.getSqlSession();
-        StudentDaoA mapper = sqlSession.getMapper(StudentDaoA.class);
+        StudentDao mapper = sqlSession.getMapper(StudentDao.class);
         List<Student> students = mapper.testHot();
         response.getWriter().write(students.toString());
     }
@@ -128,13 +129,21 @@ public class StudentServlet extends HttpServlet {
     }
 
     private void doShowAllUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Student> allStuList=null;
+        String currentPageStr=request.getParameter("currentPage");
+        if(currentPageStr==null){
+            currentPageStr="1";
+        }
+        PageBean pageBean=new PageBean();
+        int currentPage=Integer.parseInt(currentPageStr);
+        int pageSize=5;
+        String keywords = request.getParameter("keywords");
         try {
-            allStuList = stuService.showAllUser();
+            pageBean = stuService.findStudentForPageBean(currentPage, pageSize, keywords);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        request.setAttribute("allStuList",allStuList);
+        request.setAttribute("pageBean",pageBean);
+        request.setAttribute("keywords",keywords);
         request.getRequestDispatcher("/admin/user/allStudent.jsp").forward(request, response);
     }
 

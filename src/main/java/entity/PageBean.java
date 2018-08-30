@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PageBean<T> {
-    private int currentCount;
+    private int pageSize;
     private int currentPage;
     private int totalCount;
     private int totalPage;
     private List<T> pageList=new ArrayList<T>();
 
-    public int getCurrentCount() {
-        return currentCount;
+    public int getPageSize() {
+        return pageSize;
     }
 
-    public void setCurrentCount(int currentCount) {
-        this.currentCount = currentCount;
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public int getCurrentPage() {
@@ -46,7 +46,9 @@ public class PageBean<T> {
         return pageList;
     }
 
-    public void setPageList(List<T> productList) {
-        this.pageList = productList;
+    public void setPageList(List<T> pageList) {
+        this.pageList = pageList;
     }
+
+
 }
